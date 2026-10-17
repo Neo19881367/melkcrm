@@ -25,7 +25,7 @@ import java.time.ZoneId
 
 /**
  * The app's object graph without Android: one instance per process. The Android AppContainer
- * creates it with the Room store, encrypted token storage and an OkHttp-backed [RemoteApi].
+ * creates it with the Room store, encrypted token storage and a Ktor-backed [RemoteApi].
  */
 class Crm(
     val store: LocalStore,

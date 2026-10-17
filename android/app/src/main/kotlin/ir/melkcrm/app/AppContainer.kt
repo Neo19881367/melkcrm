@@ -2,7 +2,7 @@ package ir.melkcrm.app
 
 import android.content.Context
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.android.Android
 import ir.melkcrm.app.data.DataStoreSettings
 import ir.melkcrm.app.data.KeystoreTokenStorage
 import ir.melkcrm.app.data.LocaleStore
@@ -27,12 +27,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 /**
  * The app's object graph, created once in [MelkApp]. Everything platform-independent lives in
  * [Crm] (module :client, tested on the JVM); this class supplies the Android parts: Room storage,
- * Keystore-encrypted secrets, DataStore settings, private photo files and OkHttp.
+ * Keystore-encrypted secrets, DataStore settings, private photo files and the HTTP client.
  *
  * No server address, credential or API key is compiled in. The agency enters its own server URL
  * and map key in Settings; development defaults come only from android/local.properties.
@@ -55,14 +54,12 @@ class AppContainer(context: Context) {
         ),
     )
 
-    val http = HttpClient(OkHttp) {
+    // Platform HttpURLConnection engine: no OkHttp, whose current releases need a newer compileSdk.
+    val http = HttpClient(Android) {
         expectSuccess = false
         engine {
-            config {
-                connectTimeout(20, TimeUnit.SECONDS)
-                readTimeout(60, TimeUnit.SECONDS)
-                writeTimeout(60, TimeUnit.SECONDS)
-            }
+            connectTimeout = 20_000
+            socketTimeout = 60_000
         }
     }
 

@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.compose.material3:material3-desktop:1.8.2")
     implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.7.3")
     implementation("org.jetbrains.compose.ui:ui-desktop:1.8.2")
-    implementation("io.ktor:ktor-client-okhttp:3.6.0")
+    implementation("io.ktor:ktor-client-android:3.6.0")
     compileOnly("org.robolectric:android-all:15-robolectric-12650502")
     aar("org.osmdroid:osmdroid-android:6.1.20@aar")
     compileOnly(files(layout.buildDirectory.file("aar/osmdroid.jar")))

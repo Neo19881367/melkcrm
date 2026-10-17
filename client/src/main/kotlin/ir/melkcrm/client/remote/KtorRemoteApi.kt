@@ -42,7 +42,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 
 /**
- * Ktor implementation of [RemoteApi]. Works with any engine (OkHttp on Android, the test engine in
+ * Ktor implementation of [RemoteApi]. Works with any engine (the Android engine on Android, the test engine in
  * backend tests). The access token is refreshed once on a 401; refresh tokens rotate on every use.
  * JSON is encoded explicitly, so the client needs no content-negotiation plugin.
  */

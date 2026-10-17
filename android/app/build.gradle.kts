@@ -117,7 +117,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.android)
     implementation(libs.osmdroid)
     implementation(libs.coil.compose)
     debugImplementation(libs.compose.ui.tooling)

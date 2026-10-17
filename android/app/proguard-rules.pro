@@ -8,9 +8,8 @@
 -keepclasseswithmembers class ir.melkcrm.** { kotlinx.serialization.KSerializer serializer(...); }
 # Enum names are persisted
 -keepclassmembers enum ir.melkcrm.** { *; }
-# Ktor / OkHttp
+# Ktor
 -dontwarn org.slf4j.**
 -dontwarn io.ktor.**
--dontwarn okhttp3.internal.platform.**
 # osmdroid
 -dontwarn org.osmdroid.**
