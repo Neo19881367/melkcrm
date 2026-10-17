@@ -1,0 +1,8 @@
+# Copy to android/local.properties (git-ignored). Android Studio writes sdk.dir itself.
+sdk.dir=/path/to/Android/Sdk
+
+# Optional development defaults, shown pre-filled in the app. Agencies normally enter these in Settings.
+# The Android emulator reaches a backend running on this computer at 10.0.2.2.
+melkcrm.serverUrl=http://10.0.2.2:8080
+# Raster tile template; {z}/{x}/{y} are replaced. The default is OpenStreetMap's public server.
+# melkcrm.tileUrl=https://tile.openstreetmap.org/{z}/{x}/{y}.png

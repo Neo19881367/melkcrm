@@ -1,0 +1,39 @@
+# Local or single-server deployment: PostgreSQL plus the backend.
+#   cp .env.example .env    (then edit it)
+#   ../gradlew -p .. :backend:installDist
+#   docker compose up -d --build
+# The API is bound to 127.0.0.1 only: publish it through a TLS reverse proxy, never as plain HTTP.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      IMAGE_DIR: /data/images
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - images:/data/images
+
+volumes:
+  pgdata:
+  images:

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Messages looked up by name at run time (Context.stringByName): keep them when resources are shrunk. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/err_*,@string/warn_*,@string/deny_*,@string/srv_*,@string/geo_*" />
