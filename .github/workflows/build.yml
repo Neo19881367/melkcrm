@@ -1,10 +1,11 @@
 # Builds and tests everything on GitHub's machines, which can reach Google Maven.
-# The debug APK is attached to each run as the "melkcrm-debug-apk" artifact.
+# The debug APK is attached to each run as the "melkcrm-debug-apk" artifact; builds of main also put it,
+# with the generated Room schema, on the "apk" branch so it can be fetched with plain git.
 name: Build
 
 on:
   push:
-    branches-ignore: [ci-logs]
+    branches-ignore: [ci-logs, apk]
   pull_request:
   workflow_dispatch:
 
@@ -33,7 +34,7 @@ jobs:
     name: Android app
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # only for publishing build logs to the ci-logs branch when the build fails
+      contents: write   # only for publishing to the apk and ci-logs branches
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -60,6 +61,23 @@ jobs:
           name: room-schema
           path: android/app/schemas/
           if-no-files-found: ignore
+      - name: Publish APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          mkdir -p /tmp/apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk /tmp/apk/melkcrm-debug.apk
+          cp -r android/app/schemas /tmp/apk/schemas
+          cd /tmp/apk
+          git init -q -b apk
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "Debug APK of ${{ github.sha }} (run ${{ github.run_id }})"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" apk
+      # Release build without a keystore (unsigned): checks that R8 shrinking and the keep rules go through.
+      - name: Release build (R8)
+        working-directory: android
+        shell: bash
+        run: ./gradlew :app:assembleRelease --console=plain 2>&1 | tee ../assemble-release.log
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
