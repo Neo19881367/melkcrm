@@ -4,7 +4,7 @@ Internal CRM + buyer/seller matching for Iranian real-estate agencies. Android (
 
 ## Environment findings (2026-10-17)
 - JDK 21, Gradle 8.14.3, Maven Central and Gradle Plugin Portal reachable.
-- **No Android SDK, and Google Maven (`dl.google.com` / `maven.google.com`) is blocked** → AGP, AndroidX, Compose, Room cannot be downloaded in this sandbox. The app (`android/app`) is written in full and type-checked with `tools/android-typecheck`; it must be built where Google Maven is reachable (docs/RELEASE.md).
+- **No Android SDK, and Google Maven (`dl.google.com` / `maven.google.com`) is blocked** → AGP, AndroidX, Compose, Room cannot be downloaded in this sandbox. The app (`android/app`) is written in full and type-checked with `tools/android-typecheck`; it is built where Google Maven is reachable: GitHub Actions builds and tests it on every push (docs/RELEASE.md).
 - Consequence for the architecture: all business logic lives in a pure-Kotlin `:core` module (compiled and tested here) that the app and the backend both use.
 
 ## Key decisions

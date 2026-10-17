@@ -1,10 +1,40 @@
 # Building, testing and releasing the Android app
 
 The app is a separate Gradle build in `android/` that includes the root build (modules `core` and
-`client`). It has not yet been built into an APK: it was written where Google Maven is unreachable and
-was only type-checked (see the README). The steps below are the first real build.
+`client`). It needs Google Maven, so it is built on GitHub Actions rather than where it was written.
 
-## Requirements
+## On GitHub (no Android Studio needed)
+
+`.github/workflows/build.yml` runs on every push and pull request:
+
+1. the `core`, `client` and `backend` tests;
+2. `:app:assembleDebug`, uploaded as the `melkcrm-debug-apk` artifact of the run (Actions tab → the run →
+   Artifacts; GitHub hands it out as a zip);
+3. `:app:testDebugUnitTest` (the storage contract on Room, under Robolectric);
+4. on `main` only: the APK and the Room schema are pushed to the `apk` branch, replacing the previous one,
+   so `melkcrm-debug.apk` can be downloaded straight from that branch on GitHub;
+5. `:app:assembleRelease`, unsigned, to check R8 shrinking and the keep rules.
+
+When the Android job fails, the Gradle output and test results are pushed to the `ci-logs` branch.
+
+The debug APK is signed with a debug key that the GitHub machine creates for that run. Each run's key
+differs, so Android refuses to install a newer debug APK over an older one: uninstall first, which deletes
+the app's local data (whatever was synchronized stays on the server). For builds that agents keep, use a
+release key as described under Release signing; on GitHub, store the keystore and its passwords as
+repository secrets and write `keystore.properties` from them in the workflow.
+
+### Installing the APK on a phone
+
+1. Download `melkcrm-debug.apk` (from the `apk` branch, or unzip the run's artifact) onto the phone.
+2. Open it. Android asks to allow installs from the app that opened it (browser, Files, Telegram…);
+   allow it for that app once.
+3. Install and open **MelkCRM** (ملک CRM on a phone set to Persian). It needs Android 8.0 or newer.
+   Without a server it runs in device-only mode; Settings → Sample data loads synthetic records to try
+   it out.
+
+## Building locally
+
+### Requirements
 
 - JDK 17 or newer (Android Studio's bundled JDK works).
 - Android SDK with platform 35 and build tools (install through Android Studio, or `sdkmanager
@@ -16,7 +46,7 @@ was only type-checked (see the README). The steps below are the first real build
 Versions are in `gradle/libs.versions.toml` (Kotlin 2.4.20, AGP 8.13.0, KSP 2.3.12, Compose BOM 2025.06.00,
 Room 2.7.1). The Gradle wrapper (8.14.3) downloads itself.
 
-## First build
+### Build and test
 
 ```bash
 cd android
@@ -28,22 +58,21 @@ cp local.properties.example local.properties     # set sdk.dir (Android Studio d
 
 Or open the `android/` folder in Android Studio and run the `app` configuration.
 
-Things to check on this first build, because they could not be checked without Google Maven:
+Already checked on GitHub: compilation against the real AndroidX libraries, Room's annotation
+processing, the Room storage tests (`RoomLocalStoreTest`, including Persian full-text search) and the R8
+release build. Room writes the schema to `android/app/schemas/…/1.json` through its Gradle plugin; it is
+committed, and each new database version must add its own file and a migration (there is intentionally no
+destructive migration fallback).
 
-1. **Compilation against the real AndroidX libraries.** The type check used signature stubs for
-   lifecycle, navigation, Room, WorkManager, DataStore, activity and Coil. Small API differences may show
-   up as compile errors; fix them in place.
-2. **Room's annotation processing** (KSP). It writes the schema to `android/app/schemas/…/1.json`. Commit
-   that file: future schema versions need it to write migrations. There is intentionally no destructive
-   migration fallback.
-3. **The unit tests** (`RoomLocalStoreTest` runs the shared storage contract on Room and SQLite FTS,
-   including Persian search).
-4. **A run-through on a device**, in Persian and English: load the sample data (Settings), add a customer,
+Still to check by hand:
+
+1. **A run-through on a device**, in Persian and English: load the sample data (Settings), add a customer,
    a requirement and a property with a map pin, open Matching, record an offer and a counteroffer, export a
    report as an admin, and sign in to a local backend (`http://10.0.2.2:8080` from the emulator, see
    [BACKEND.md](BACKEND.md)) to check sync and conflicts with two devices.
-5. **A release build with R8** (below), installed and opened, since shrinking can remove classes used only
-   through serialization. The keep rules are in `android/app/proguard-rules.pro`.
+2. **A signed release build** (below), installed and opened, since shrinking can remove classes used only
+   through serialization even when the build itself succeeds. The keep rules are in
+   `android/app/proguard-rules.pro`.
 
 ## Release signing
 

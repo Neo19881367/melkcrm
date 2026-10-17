@@ -18,10 +18,12 @@ explains every score.
 | `core` (domain rules, Jalali, money, matching, permissions, reports) | Compiled; **108 unit tests pass** |
 | `client` (repositories, sync engine, session, matching runs, storage contract) | Compiled; **60 unit tests pass** |
 | `backend` | Compiled; **21 tests pass on H2 and on PostgreSQL 16**. The Docker image builds and `docker compose up` starts PostgreSQL 16 and the backend healthy; login, roles, sync push and conflict, photo upload to the volume, CSV export, refresh-token reuse detection and the backup commands were exercised against it over HTTP. |
-| Android app | **Type-checked, not built.** Google Maven (AGP, AndroidX, Jetpack Compose, Room) is unreachable in the environment where it was written, so no APK was produced. All 681 Kotlin classes and the unit tests compile with zero errors against Compose Multiplatform, Robolectric's Android framework jar, the real osmdroid library and signature stubs for the AndroidX classes used (see `tools/android-typecheck`). Resource merging, Room's annotation processing, R8 and the Robolectric/Room tests have not run yet. |
+| Android app | **Built on GitHub Actions** (`.github/workflows/build.yml`): the debug APK builds, the **16 storage contract tests pass on Room and SQLite FTS** (Robolectric), and the release build goes through R8 shrinking. Not yet run on a device or emulator: the screens, map, notifications and sync against a server have only been checked by compiling. |
 
-The first build on a normal machine is therefore the first real Android build: see
-[docs/RELEASE.md](docs/RELEASE.md). Fix anything it reports before giving the APK to agents.
+Every push builds the debug APK. It is attached to the run as the `melkcrm-debug-apk` artifact, and
+builds of `main` also put it on the `apk` branch as `melkcrm-debug.apk`. Try it on a device as described
+in [docs/RELEASE.md](docs/RELEASE.md) before giving it to agents; real use needs a release build signed
+with the agency's own key.
 
 ## Repository layout
 
@@ -56,8 +58,8 @@ docker compose up -d --build          # PostgreSQL 16 + backend on 127.0.0.1:808
 curl http://127.0.0.1:8080/health
 ```
 
-**Build the Android app** (needs the Android SDK and access to Google Maven; details in
-[docs/RELEASE.md](docs/RELEASE.md)):
+**Build the Android app** (GitHub Actions does this on every push; locally it needs the Android SDK and
+access to Google Maven; details in [docs/RELEASE.md](docs/RELEASE.md)):
 
 ```bash
 cd android
@@ -128,7 +130,9 @@ HTTPS.
 
 ## Known limitations
 
-- The Android app has not been built or run yet (see Status). Expect the first build to need small fixes.
+- The Android app has been built and its storage tested, but not yet used on a device (see Status).
+- Debug APKs from GitHub are signed with a new throwaway key on every run, so a newer one installs only
+  after uninstalling the old one, which deletes its local data. Use a release key for anything kept.
 - Neshan search endpoints and response fields follow its public documentation but could not be called
   from here; verify them with a real key before relying on address search. Manual pins always work.
 - The default OpenStreetMap tile server has a usage policy that does not allow heavy production use;
