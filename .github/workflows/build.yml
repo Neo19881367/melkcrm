@@ -4,6 +4,7 @@ name: Build
 
 on:
   push:
+    branches-ignore: [ci-logs]
   pull_request:
   workflow_dispatch:
 
@@ -15,8 +16,8 @@ jobs:
     name: Core, client and backend tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -31,16 +32,19 @@ jobs:
   android:
     name: Android app
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # only for publishing build logs to the ci-logs branch when the build fails
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
       - name: Debug APK
         working-directory: android
-        run: ./gradlew :app:assembleDebug --console=plain
+        shell: bash
+        run: ./gradlew :app:assembleDebug --console=plain 2>&1 | tee ../assemble.log
       - uses: actions/upload-artifact@v4
         with:
           name: melkcrm-debug-apk
@@ -48,7 +52,8 @@ jobs:
           if-no-files-found: error
       - name: Unit tests (Robolectric, Room)
         working-directory: android
-        run: ./gradlew :app:testDebugUnitTest --console=plain
+        shell: bash
+        run: ./gradlew :app:testDebugUnitTest --console=plain 2>&1 | tee ../unit-tests.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -60,3 +65,16 @@ jobs:
         with:
           name: android-test-reports
           path: android/app/build/reports/
+      # Full Gradle output on a branch of its own, readable with plain git when log downloads are not possible.
+      - name: Publish build logs
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p /tmp/ci-logs
+          cp ./*.log /tmp/ci-logs/ 2>/dev/null || true
+          find android/app/build/test-results -name '*.xml' -exec cp {} /tmp/ci-logs/ \; 2>/dev/null || true
+          cd /tmp/ci-logs
+          git init -q -b ci-logs
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "Build logs of run ${{ github.run_id }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci-logs
