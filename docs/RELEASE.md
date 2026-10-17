@@ -13,7 +13,7 @@ was only type-checked (see the README). The steps below are the first real build
   AndroidX, Jetpack Compose and Room. Inside Iran this usually needs whatever access your team already
   uses for Android development; the Gradle files reference only the official repositories.
 
-Versions are in `gradle/libs.versions.toml` (Kotlin 2.4.20, AGP 8.11.1, KSP 2.3.12, Compose BOM 2025.06.00,
+Versions are in `gradle/libs.versions.toml` (Kotlin 2.4.20, AGP 8.13.0, KSP 2.3.12, Compose BOM 2025.06.00,
 Room 2.7.1). The Gradle wrapper (8.14.3) downloads itself.
 
 ## First build
