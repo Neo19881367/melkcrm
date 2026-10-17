@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 val localProps = Properties().apply {
@@ -89,8 +90,13 @@ kotlin {
     }
 }
 
+// Room's plugin declares the schema folder to Gradle, so the exported schema survives cached builds.
+// Commit android/app/schemas: later database versions need it to write and test migrations.
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.generateKotlin", "true")
 }
 
