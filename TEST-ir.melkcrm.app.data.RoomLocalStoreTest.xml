@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ir.melkcrm.app.data.RoomLocalStoreTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-10-17T16:14:49.180Z" hostname="runnervm8k3b6" time="5.018">
+  <properties/>
+  <testcase name="searchFollowsUpdatesAndSkipsDeleted" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="3.989"/>
+  <testcase name="allSkipsSoftDeletedUnlessAsked" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.087"/>
+  <testcase name="searchMatchesEveryWordAsAPrefix" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.084"/>
+  <testcase name="putGetAndReplace" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.058"/>
+  <testcase name="metaSetRemoveAndObserve" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.09"/>
+  <testcase name="searchHandlesPersianText" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.057"/>
+  <testcase name="clearAllWipesEverything" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.095"/>
+  <testcase name="observeEmitsCurrentRecordsWithoutDeletedOnes" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.081"/>
+  <testcase name="conflictsKeepTheServerCopy" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.106"/>
+  <testcase name="imagesAreOrderedAndPendingIncludesFailures" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.059"/>
+  <testcase name="transactionCommitsOrRollsBack" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.044"/>
+  <testcase name="auditIsPerEntityNewestFirst" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.036"/>
+  <testcase name="deleteSampleRecordsKeepsRealData" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.057"/>
+  <testcase name="removeDropsTheRecordAndItsQueuedChange" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.056"/>
+  <testcase name="byCustomerAndByPropertySkipDeleted" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.048"/>
+  <testcase name="outboxKeepsOneEntryPerRecordInQueueOrder" classname="ir.melkcrm.app.data.RoomLocalStoreTest" time="0.067"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[[Robolectric] WARN: Android SDK 36 requires Java 21 (have Java 17). Tests won't be run on SDK 36 unless explicitly requested.
+]]></system-err>
+</testsuite>
